@@ -54,12 +54,36 @@ template<typename Type, size_t BitPosition>
 struct Mask<Type, BitPosition>
 {
   static constexpr Type BITMASK{1 << BitPosition};
+  static constexpr Type MASKSIZE{1};
 
+  template<Type Value>
+  static void writeTo(volatile Type& dest)
+  {
+    static_assert(Value < (1 << MASKSIZE));
+    dest = (dest & ~BITMASK) | distribute<Value>();
+  }
+
+  template<Type Value>
+  static void writeTo(Type& dest)
+  {
+    static_assert(Value < (1 << MASKSIZE));
+    dest = (dest & ~BITMASK) | distribute<Value>();
+  }
+
+  static void writeTo(const Type value, Type& dest)
+  {
+    dest = (dest & ~BITMASK) | distribute(value);
+  }
+  static void writeTo(const Type value, volatile Type& dest)
+  {
+    dest = (dest & ~BITMASK) | distribute(value);
+  }
+
+  static Type readFrom(const Type src) { return (src & (1 << BitPosition)) > 0; }
+  
   template<Type Value>
   static Type distribute(void) { return ((Value & 1) > 0) << BitPosition; }
   static Type distribute(const Type value) { return ((value & 1) > 0) << BitPosition; }
-
-  static Type readFrom(const Type src) { return (src & (1 << BitPosition)) > 0; }
 };
   
 } // namespace smartmask
