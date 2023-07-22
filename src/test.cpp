@@ -6,7 +6,7 @@
 
 
 static constexpr smartmask::Distributed<uint32_t, 31, 20, 0> MyMask1;
-static constexpr smartmask::Contigous<uint32_t, 2, 1> MyMask2;
+static constexpr smartmask::Contigous<uint32_t, 31, 0> MyMask2;
 static constexpr smartmask::Contigous<uint32_t, 3> MyMask3;
 
 int main()
@@ -42,6 +42,8 @@ int main()
   MyMask3.writeTo(0b0, reg);
   std::cout << "reg after non-template write:\n" << std::bitset<32>{reg} << "\n";
   std::cout << "value after non-template write:\n" << MyMask3.readFrom(reg) << "\n";
+
+  constexpr uint32_t m{8 * sizeof(uint32_t)};
 
 
   return 0;

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 
 namespace smartmask
 {
@@ -11,18 +12,19 @@ struct Distributed
   static constexpr Type ONE{static_cast<Type>(1)};
   static constexpr Type BITMASK{(ONE << BitPositionLeft) | Distributed<Type, BitPositionsRight...>::BITMASK};
   static constexpr size_t MASKSIZE{ONE + sizeof...(BitPositionsRight)};
+  static constexpr Type MAX_VALUE{MASKSIZE >= sizeof(Type) * 8 ? std::numeric_limits<Type>::max() : (ONE << MASKSIZE) - 1};
 
   template<Type Value>
   static void writeTo(volatile Type& dest)
   {
-    static_assert(Value < (ONE << MASKSIZE));
+    static_assert(Value <= MAX_VALUE);
     dest = (dest & ~BITMASK) | distribute<Value>();
   }
 
   template<Type Value>
   static void writeTo(Type& dest)
   {
-    static_assert(Value < (ONE << MASKSIZE));
+    static_assert(Value <= MAX_VALUE);
     dest = (dest & ~BITMASK) | distribute<Value>();
   }
 
