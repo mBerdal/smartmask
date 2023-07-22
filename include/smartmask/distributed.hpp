@@ -6,10 +6,10 @@
 namespace smartmask
 {
 template<typename Type, size_t BitPositionLeft, size_t... BitPositionsRight>
-struct Mask
+struct Distributed
 {
   static constexpr Type ONE{static_cast<Type>(1)};
-  static constexpr Type BITMASK{(ONE << BitPositionLeft) | Mask<Type, BitPositionsRight...>::BITMASK};
+  static constexpr Type BITMASK{(ONE << BitPositionLeft) | Distributed<Type, BitPositionsRight...>::BITMASK};
   static constexpr size_t MASKSIZE{ONE + sizeof...(BitPositionsRight)};
 
   template<Type Value>
@@ -37,22 +37,22 @@ struct Mask
 
   static Type readFrom(const Type src)
   {
-    return (((src & (ONE << BitPositionLeft)) > 0) << (MASKSIZE - ONE)) | Mask<Type, BitPositionsRight...>::readFrom(src);
+    return (((src & (ONE << BitPositionLeft)) > 0) << (MASKSIZE - ONE)) | Distributed<Type, BitPositionsRight...>::readFrom(src);
   }
 
   template<Type Value>  
   static Type distribute(void)
   {
-    return (((Value & (ONE << (MASKSIZE - ONE))) > 0) << BitPositionLeft) | Mask<Type, BitPositionsRight...>::template distribute<Value>();
+    return (((Value & (ONE << (MASKSIZE - ONE))) > 0) << BitPositionLeft) | Distributed<Type, BitPositionsRight...>::template distribute<Value>();
   }
   static Type distribute(const Type value)
   {
-    return (((value & (ONE << (MASKSIZE - ONE))) > 0) << BitPositionLeft) | Mask<Type, BitPositionsRight...>::distribute(value);
+    return (((value & (ONE << (MASKSIZE - ONE))) > 0) << BitPositionLeft) | Distributed<Type, BitPositionsRight...>::distribute(value);
   }
 };
 
 template<typename Type, size_t BitPosition>
-struct Mask<Type, BitPosition>
+struct Distributed<Type, BitPosition>
 {
   static constexpr Type ONE{static_cast<Type>(1)};
   static constexpr Type BITMASK{ONE << BitPosition};
