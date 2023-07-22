@@ -12,7 +12,8 @@ struct Distributed
   static constexpr Type ONE{static_cast<Type>(1)};
   static constexpr Type BITMASK{(ONE << BitPositionLeft) | Distributed<Type, BitPositionsRight...>::BITMASK};
   static constexpr size_t MASKSIZE{ONE + sizeof...(BitPositionsRight)};
-  static constexpr Type MAX_VALUE{MASKSIZE >= sizeof(Type) * 8 ? std::numeric_limits<Type>::max() : (ONE << MASKSIZE) - 1};
+  static constexpr Type MAX_VALUE{MASKSIZE == sizeof(Type) * 8 ? std::numeric_limits<Type>::max() : (ONE << MASKSIZE) - 1};
+  static_assert(MASKSIZE <= sizeof(Type) * 8);
 
   template<Type Value>
   static void writeTo(volatile Type& dest)
